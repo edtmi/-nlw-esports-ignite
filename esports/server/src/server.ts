@@ -10,10 +10,10 @@ app.get("/games", async (request, response) => {
       _count: {
         select: {
           ads: true,
-        }
-      }
-    }
-  })
+        },
+      },
+    },
+  });
 
   return response.json(games);
 });
@@ -51,14 +51,21 @@ app.get("/games/:id/ads", async (request, response) => {
   }));
 });
 
-app.get("/ads/:id/discord", (request, response) => {
+app.get("/ads/:id/discord", async (request, response) => {
   const adId = request.params.id;
 
-  return response.json([
-    { id: 1, name: "Anúncio 1" },
-    { id: 2, name: "Anúncio 2" },
-    { id: 3, name: "Anúncio 3" },
-  ]);
+  const ad = await prisma.ad.findUniqueOrThrow({
+    select: {
+      discord: true,
+    },
+    where: {
+      id: adId,
+    },
+  });
+
+  return response.json({
+    discord: ad.discord,
+  });
 });
 
 app.listen(3333, () => {
